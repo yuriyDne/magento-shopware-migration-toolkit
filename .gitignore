@@ -1,0 +1,8 @@
+# Private outputs of the scripts — these quote real domains, brand names and PII.
+# Never commit them.
+preflight-*.md
+anonymized.sql
+*.sql
+
+# Local secrets / env
+.env

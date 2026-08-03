@@ -1,0 +1,29 @@
+{
+  "_comment": "Input for prepare-target.php. List everything the source needs that a fresh Shopware install lacks. Run scripts/preflight-report.sh against your source to fill these in. Idempotent: entities already present are skipped.",
+
+  "currencies": [
+    { "iso": "USD", "symbol": "$", "name": "US Dollar", "factor": 1 },
+    { "iso": "GBP", "symbol": "£", "name": "Pound Sterling", "factor": 0.79 }
+  ],
+
+  "defaultCurrency": {
+    "iso": "USD",
+    "symbol": "$",
+    "name": "US Dollar",
+    "oldDefaultFactor": 1
+  },
+
+  "taxRates": [0, 7.25, 8.875, 20],
+
+  "customerGroups": ["Retail", "Wholesale"],
+
+  "paymentMethods": [
+    { "technicalName": "migrated_paypal", "name": "PayPal", "description": "" },
+    { "technicalName": "migrated_credit_card", "name": "Credit Card", "description": "" }
+  ],
+
+  "shippingMethods": [
+    { "technicalName": "migrated_ups", "name": "UPS" },
+    { "technicalName": "migrated_pickup", "name": "Store pickup" }
+  ]
+}

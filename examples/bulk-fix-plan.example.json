@@ -1,0 +1,43 @@
+{
+  "_comment": "Input for bulk-fix.php. Each entry resolves one fixable error group (entity + field) for every failing row at once, writing swag_migration_fix rows via the Sync API. Inspect swag_migration_logging to see which entity/field pairs are failing, then describe the value each should get.",
+
+  "placeholderCustomerNumber": "MIGRATION-PLACEHOLDER",
+
+  "fixes": [
+    {
+      "_note": "address-less customers get the placeholder customer's address (the tool's own remedy)",
+      "entity": "customer",
+      "field": "defaultBillingAddressId",
+      "value": "@placeholderAddress"
+    },
+    {
+      "entity": "customer",
+      "field": "defaultShippingAddressId",
+      "value": "@placeholderAddress"
+    },
+    {
+      "_note": "SEO URLs from Chinese store views: give each the right language per store (works around the script-subtag locale bug; see [LINK: article] for the full failure analysis). storeIds are the source store_id values for those views.",
+      "entity": "seo_url",
+      "field": "languageId",
+      "value": "@language:zh-CN",
+      "storeIds": [3, 10]
+    },
+    {
+      "entity": "seo_url",
+      "field": "languageId",
+      "value": "@language:zh-TW",
+      "storeIds": [7, 9]
+    },
+    {
+      "_note": "empty legacy names and damaged emails get safe placeholders",
+      "entity": "customer",
+      "field": "firstName",
+      "value": "Unknown"
+    },
+    {
+      "entity": "customer",
+      "field": "email",
+      "value": "placeholder@example.invalid"
+    }
+  ]
+}

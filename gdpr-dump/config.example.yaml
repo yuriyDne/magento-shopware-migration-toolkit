@@ -1,0 +1,179 @@
+---
+# Example anonymization config for a Magento 2 source, for Smile-SA/gdpr-dump (v5.x).
+# https://github.com/Smile-SA/gdpr-dump
+#
+# It extends the built-in `magento2` template (which already handles core customers,
+# addresses, orders, quotes, newsletter, admin users and standard payment payloads)
+# and ADDS the gaps that template misses on a real shop:
+#
+#   1. PSP JSON payloads inside sales_order_payment / quote_payment.additional_information
+#      — PayPal / Stripe keys the base template does not reach into.
+#   2. Custom columns on core tables (e.g. an extra email on `quote`).
+#   3. Custom business tables (subscriptions, CRM, marketing/tracking) with PII.
+#
+# Two converter styles are used, on purpose:
+#   - `faker` (parameters.formatter = any FakerPHP formatter) → PLAUSIBLE fake values
+#     (real-looking names, emails, cities). Use this for human-readable PII, e.g. so a
+#     demo or screenshot shows "Maria Garcia", not "03jyag 3mae1rd".
+#   - `randomizeText` → an opaque random string. Use this for tokens / ids / secrets,
+#     which SHOULD look like random strings; a faker name there would be less realistic.
+#
+# Sections 2, 3 and 4 are SHOP-SPECIFIC: the table and column names below are
+# placeholders. Find yours with `scripts/preflight-report.sh` (section 12 lists custom
+# columns on core tables) and by scanning `SHOW TABLES` for custom prefixes, then
+# replace the placeholders. Keep the FORMAT of anonymized values valid (a password hash
+# must stay hash-shaped, an email must stay a valid address) or the migration will choke.
+
+extends: magento2
+version: '2.4.7'
+
+database:
+  host: '127.0.0.1'
+  port: '3306'
+  user: 'root'
+  password: ''          # pass via env, do not commit a real password
+  name: 'magento'
+
+dump:
+  output: './anonymized.sql'
+
+tables:
+  # --- 0. Plausible core PII (override the base template with faker) ---------
+  # The `magento2` template already anonymizes these, but with random strings.
+  # Override them with faker for real-looking values — useful when the anonymized
+  # copy will be shown (demos, screenshots). Remove this block if you do not care.
+  customer_entity:
+    converters:
+      firstname:
+        converter: 'faker'
+        parameters: { formatter: 'firstName' }
+      lastname:
+        converter: 'faker'
+        parameters: { formatter: 'lastName' }
+      email:
+        converter: 'faker'
+        parameters: { formatter: 'safeEmail' }
+
+  customer_address_entity:
+    converters:
+      firstname:
+        converter: 'faker'
+        parameters: { formatter: 'firstName' }
+      lastname:
+        converter: 'faker'
+        parameters: { formatter: 'lastName' }
+      street:
+        converter: 'faker'
+        parameters: { formatter: 'streetAddress' }
+      city:
+        converter: 'faker'
+        parameters: { formatter: 'city' }
+      postcode:
+        converter: 'faker'
+        parameters: { formatter: 'postcode' }
+      telephone:
+        converter: 'faker'
+        parameters: { formatter: 'phoneNumber' }
+      company:
+        converter: 'faker'
+        parameters: { formatter: 'company' }
+
+  # --- 1. PSP JSON payloads (generic PayPal / Stripe keys) ------------------
+  # The base template anonymizes the row but not the JSON blob inside it. These
+  # keys are standard PayPal/Stripe field names — keep the ones your PSP writes.
+  # Tokens/ids stay randomizeText (they should look like random strings); the one
+  # human-readable field (payer email) gets a plausible faker email.
+  sales_order_payment:
+    converters:
+      additional_information:
+        converter: jsonData
+        parameters:
+          converters:
+            paypal_payer_email:
+              converter: 'faker'
+              parameters: { formatter: 'safeEmail' }
+            paypal_payer_id: { converter: randomizeText }
+            paypal_express_checkout_payer_id: { converter: randomizeText }
+            paypal_express_checkout_token: { converter: randomizeText }
+            paypal_correlation_id: { converter: randomizeText }
+            paypal_billing_agreement_id: { converter: randomizeText }
+            paypal_reference_id: { converter: randomizeText }
+            ba_agreement_id: { converter: randomizeText }
+            ba_reference_id: { converter: randomizeText }
+            token: { converter: randomizeText }
+            cvc_token: { converter: randomizeText }
+            stripejs_token: { converter: randomizeText }
+            confirmation_token: { converter: randomizeText }
+            client_secret: { converter: randomizeText }
+            payment_intent_id: { converter: randomizeText }
+            customer_stripe_id: { converter: randomizeText }
+            server_side_transaction_id: { converter: randomizeText }
+            checkout_token: { converter: randomizeText }
+            transaction_id: { converter: randomizeText }
+            authorization: { converter: randomizeText }
+
+  quote_payment:
+    converters:
+      additional_information:
+        converter: jsonData
+        parameters:
+          converters:
+            paypal_payer_email:
+              converter: 'faker'
+              parameters: { formatter: 'safeEmail' }
+            token: { converter: randomizeText }
+            client_secret: { converter: randomizeText }
+            payment_intent_id: { converter: randomizeText }
+            customer_stripe_id: { converter: randomizeText }
+            transaction_id: { converter: randomizeText }
+            authorization: { converter: randomizeText }
+
+  # --- 2. Custom column on a core table (PLACEHOLDER) -----------------------
+  # Example: an extension added an email column to `quote`. Replace with yours.
+  quote:
+    converters:
+      example_custom_email:
+        converter: 'faker'
+        parameters: { formatter: 'safeEmail' }
+
+  # --- 3. Custom business table with PII (PLACEHOLDER) ----------------------
+  # Example: a subscription/CRM table the template knows nothing about.
+  # Rename to your table and list its real PII columns.
+  example_subscription:
+    converters:
+      customer_email:
+        converter: 'faker'
+        parameters: { formatter: 'safeEmail' }
+      customer_name:
+        converter: 'faker'
+        parameters: { formatter: 'name' }
+      customer_phone:
+        converter: 'faker'
+        parameters: { formatter: 'phoneNumber' }
+      delivery_first_name:
+        converter: 'faker'
+        parameters: { formatter: 'firstName' }
+      delivery_last_name:
+        converter: 'faker'
+        parameters: { formatter: 'lastName' }
+      delivery_address_1:
+        converter: 'faker'
+        parameters: { formatter: 'streetAddress' }
+      delivery_city:
+        converter: 'faker'
+        parameters: { formatter: 'city' }
+      delivery_zip:
+        converter: 'faker'
+        parameters: { formatter: 'postcode' }
+      order_notes:
+        converter: 'faker'
+        parameters: { formatter: 'sentence' }
+      payment_provider_customer_id: { converter: randomizeText }
+      payment_method_last_digits: { converter: randomizeNumber }
+
+  # --- 4. Marketing / tracking tables — data not needed for a migration -----
+  # Drop the rows entirely. Replace these names with your tracking tables.
+  example_marketing_events:
+    truncate: true
+  example_tracking_log:
+    truncate: true
