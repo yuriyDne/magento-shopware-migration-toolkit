@@ -81,7 +81,7 @@ are filled in once the reports are filed.)
 
 ## Links
 
-- Article (methodology + findings): [LINK: article]
+- Background / full analysis: [One locale code silently killed 92% of a Magento → Shopware migration](https://dev.to/yuriydne/one-locale-code-silently-killed-92-of-a-magento-shopware-migration-and-the-tool-reported-done-4l6j)
 
 ## License
 

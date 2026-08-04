@@ -16,7 +16,7 @@
       "value": "@placeholderAddress"
     },
     {
-      "_note": "SEO URLs from Chinese store views: give each the right language per store (works around the script-subtag locale bug; see [LINK: article] for the full failure analysis). storeIds are the source store_id values for those views.",
+      "_note": "SEO URLs from Chinese store views: give each the right language per store (works around the script-subtag locale bug; see https://dev.to/yuriydne/one-locale-code-silently-killed-92-of-a-magento-shopware-migration-and-the-tool-reported-done-4l6j for the full failure analysis). storeIds are the source store_id values for those views.",
       "entity": "seo_url",
       "field": "languageId",
       "value": "@language:zh-CN",
