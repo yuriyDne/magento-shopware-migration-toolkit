@@ -9,6 +9,11 @@ onto, filling the premapping, and resolving fixable errors in bulk instead of 25
 Built and used in a local lab that ran the Assistant against several real Magento shops. The
 findings behind each script are written up in the article linked below.
 
+## Upstream contributions
+
+- Locale script-subtag fallback (`zh_Hans_CN` → `zh-CN`) — merged into SwagMigrationMagento: [PR #61](https://github.com/shopware/SwagMigrationMagento/pull/61). Write-up: [dev.to article](https://dev.to/yuriydne/one-locale-code-silently-killed-92-of-a-magento-shopware-migration-and-the-tool-reported-done-4l6j)
+  
+
 ## Who this is for
 
 Agencies and developers doing Magento → Shopware migrations who already know Magento, and want
